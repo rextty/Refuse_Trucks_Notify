@@ -22,7 +22,8 @@ class Refuse_Trucks:
               checkDelay: int = 10,
               dayList: List[int] = None,
               startTime: str = None,
-              endTime: str = None):
+              endTime: str = None,
+              deviation: int = None):
         """
         To setup a checker,
         and you can setting param for more condition.
@@ -30,16 +31,26 @@ class Refuse_Trucks:
         :param routeId: RouteId is the refuse trucks route code, 55 for my area.
         :param stationName: A nickname to know where is the refuse trucks at if in the area, the default is "No set station name"
         :param checkDelay: Just a second for request interval, avoid to burden server, e.g. 10
-        :param dayList: a list for day condition, e.g. [1, 3, 4, 7]
-        :param startTime: range of time start coordinate e.g. "2020 11 2 16 40".
-        :param endTime: range of time end coordinate e.g. "2020 11 2 17 10".
+        :param dayList: A list for day condition, e.g. [1, 3, 4, 7]
+        :param startTime: Range of time start coordinate e.g. "2020 11 2 16 40".
+        :param endTime: Range of time end coordinate e.g. "2020 11 2 17 10".
+        :param deviation: A weights for coordinate, also it's a switcher,
+        if you want to know more about this args pls see function "checkCurrentTimeInRange" annotation.
         """
 
         print(f'Start checking... Station Name: {stationName}')
-        thread = threading.Thread(target=self.__startListen, args=(coor, routeId, stationName, checkDelay, dayList, startTime, endTime))
+        thread = threading.Thread(target=self.__startListen,
+                                  args=(coor,
+                                        routeId,
+                                        stationName,
+                                        checkDelay,
+                                        dayList,
+                                        startTime,
+                                        endTime,
+                                        deviation))
         thread.start()
 
-    def __startListen(self, coor, routeId, stationName, checkDelay, dayList, startTime, endTime):
+    def __startListen(self, coor, routeId, stationName, checkDelay, dayList, startTime, endTime, deviation):
         """
         Use threading to start a checker.
         """
@@ -54,9 +65,9 @@ class Refuse_Trucks:
                     continue
 
             position = self.spyder.getRefuse_Trucks_Position(routeId)
-
+            print(position)
             if position:
-                result = self.checkCoordinateInRange(coor, position)
+                result = self.checkCoordinateInRange(coor, position, deviation)
 
                 if result:
                     winsound.MessageBeep(20)
@@ -65,20 +76,31 @@ class Refuse_Trucks:
             time.sleep(checkDelay)
 
     @staticmethod
-    def checkCoordinateInRange(coor: coordinate, checkCoor: List[float]) -> bool:
+    def checkCoordinateInRange(coor: coordinate, checkCoor: List[float], deviation: int) -> bool:
         """
         To check coordinate is in range.
         :param coor: range start and end.
         :param checkCoor: check range.
+        :param deviation: A weights for coordinate, also it's a switcher, if you give a number than it's will
+        switch to another check coordinate mode "Dot mode", is mean the param "coor" you just give a area center coordinate to "startCoor",
+        then it will add the deviation weights to calc the check area, value suggest is 40 ~ 60, cause it's coordinate.
         :rtype bool
         Coordinate format use google map pushpin to get,
         e.g. ([24.748443, 121.732561], [24.748210, 121.732792])
         """
         checkLa, checkLo = map(float, checkCoor)
-        startLa = coor.getStartCoorLa()
-        startLo = coor.getStartCoorLo()
-        endLa = coor.getEndCoorLa()
-        endLo = coor.getEndCoorLo()
+
+        if deviation:
+            deviation = deviation / 100000
+            startLa = coor.getStartCoorLa() + deviation
+            startLo = coor.getStartCoorLo() - deviation
+            endLa = coor.getStartCoorLa() - deviation
+            endLo = coor.getStartCoorLo() + deviation
+        else:
+            startLa = coor.getStartCoorLa()
+            startLo = coor.getStartCoorLo()
+            endLa = coor.getEndCoorLa()
+            endLo = coor.getEndCoorLo()
 
         if startLa > endLa and endLo > startLo:
             return endLa <= checkLa <= startLa and startLo <= checkLo <= endLo
@@ -138,6 +160,12 @@ class Refuse_Trucks:
 
 
 if __name__ == '__main__':
-    dropCor = coordinate.coordinate([24.779675, 121.758239], [24.770314, 121.766857])
     obj = Refuse_Trucks()
-    obj.start(dropCor, dayList=[1, 2, 3, 4, 5, 6, 7], startTime="48", endTime="59")
+
+    # Normal version
+    # dropCor = coordinate.coordinate([24.779675, 121.758239], [24.770314, 121.766857])
+    # obj.start(dropCor, dayList=[1, 2, 3, 4, 5, 6, 7], startTime="00", endTime="59", deviation=50)
+
+    # Dot version
+    dropCorDOT = coordinate.coordinate([24.748447, 121.732522], [0.0, 0.0])
+    obj.start(dropCorDOT, dayList=[1, 2, 3, 4, 5, 6, 7], startTime="0", endTime="59", deviation=50)

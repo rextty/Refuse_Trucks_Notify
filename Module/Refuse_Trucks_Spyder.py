@@ -29,6 +29,11 @@ class Spyder:
         }
 
     def getRefuse_Trucks_Position(self, routeId: str) -> Union[list, bool]:
+        """
+        Use requests to get the refuse trucks data from APIs.
+        :param routeId: filter the route by id.
+        :rtype bool
+        """
         rs = requests.post(url=self.url, data=self.data, headers=self.headers)
         jData = json.loads(rs.content.decode())
         for data in jData:
