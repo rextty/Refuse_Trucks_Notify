@@ -4,7 +4,7 @@ from typing import List
 class coordinate:
     def __init__(self, startCoor: List[float], endCoor: List[float]):
         """
-        Normal coordinate range's entity.
+        Normal coordinate entity.
         :param startCoor: range start.
         :param endCoor: range end.
         Coordinate format e.g. ([24.748443, 121.732561], [24.748210, 121.732792])
