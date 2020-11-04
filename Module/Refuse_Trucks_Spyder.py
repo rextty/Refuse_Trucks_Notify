@@ -38,7 +38,10 @@ class Spyder:
         jData = json.loads(rs.content.decode())
         for data in jData:
             if data['RouteID'] == routeId:
-                return [data['CarLat'], data['CarLon']]
+                if data['CarLat'] and data['CarLon']:
+                    return [data['CarLat'], data['CarLon']]
+                else:
+                    return False
             break
         return False
 

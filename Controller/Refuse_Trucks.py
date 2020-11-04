@@ -65,7 +65,7 @@ class Refuse_Trucks:
                     continue
 
             position = self.spyder.getRefuse_Trucks_Position(routeId)
-            print(position)
+
             if position:
                 result = self.checkCoordinateInRange(coor, position, deviation)
 
@@ -144,7 +144,7 @@ class Refuse_Trucks:
         return startTimestamp <= timesTimestamp <= endTimestamp
 
     @staticmethod
-    def checkDay(dayList):
+    def checkDay(dayList: List[int]) -> bool:
         """
         To check today is in dayList range.
         :param dayList: List of day, e.g. [1, 2, 3, 4, 5, 6, 7].
@@ -161,11 +161,5 @@ class Refuse_Trucks:
 
 if __name__ == '__main__':
     obj = Refuse_Trucks()
-
-    # Normal version
-    # dropCor = coordinate.coordinate([24.779675, 121.758239], [24.770314, 121.766857])
-    # obj.start(dropCor, dayList=[1, 2, 3, 4, 5, 6, 7], startTime="00", endTime="59", deviation=50)
-
-    # Dot version
-    dropCorDOT = coordinate.coordinate([24.748447, 121.732522], [0.0, 0.0])
-    obj.start(dropCorDOT, dayList=[1, 2, 3, 4, 5, 6, 7], startTime="0", endTime="59", deviation=50)
+    dropCor = coordinate.coordinate([24.748447, 121.732522], [0.0, 0.0])
+    obj.start(dropCor, dayList=[1, 2, 3, 4, 5, 6, 7], startTime="00", endTime="59", deviation=50)
