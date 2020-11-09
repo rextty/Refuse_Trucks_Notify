@@ -71,7 +71,7 @@ class Refuse_Trucks:
 
                 if result:
                     winsound.MessageBeep(20)
-                    ctypes.windll.user32.MessageBoxW(0, f'垃圾車已到達: {stationName} 此站點', '垃圾車到點通知', 0)
+                    ctypes.windll.user32.MessageBoxW(0, f'垃圾車已到達: {stationName} 此站點', '垃圾車到點通知', 0x1000)
                     return True
             time.sleep(checkDelay)
 
