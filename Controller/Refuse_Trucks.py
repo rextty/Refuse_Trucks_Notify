@@ -19,7 +19,7 @@ class Refuse_Trucks:
     def start(self, coor: coordinate,
               routeId: str = '55',
               stationName: str = '未設站點名稱',
-              checkDelay: int = 10,
+              checkDelay: int = 15,
               dayList: List[int] = None,
               startTime: str = None,
               endTime: str = None,

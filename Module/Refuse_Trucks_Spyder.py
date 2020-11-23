@@ -1,10 +1,13 @@
 from typing import Union
 import requests
+from fake_useragent import UserAgent
 import json
 
 
 class Spyder:
     def __init__(self):
+        ua = UserAgent()
+
         self.url = 'http://clean.ilepb.gov.tw/YLBarBageAPI/API/GetCollectInfoByCoor.ashx'
 
         self.headers = {
@@ -17,7 +20,7 @@ class Spyder:
             'Host': 'clean.ilepb.gov.tw',
             'Origin': 'http://clean.ilepb.gov.tw',
             'Referer': 'http://clean.ilepb.gov.tw/YLRtCQS/RefusetrucksLive.aspx',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36',
+            'User-Agent': ua.random,
             'X-Requested-With': 'XMLHttpRequest',
         }
 
@@ -34,16 +37,19 @@ class Spyder:
         :param routeId: filter the route by id.
         :rtype bool
         """
-        rs = requests.post(url=self.url, data=self.data, headers=self.headers)
-        jData = json.loads(rs.content.decode())
-        for data in jData:
-            if data['RouteID'] == routeId:
-                if data['CarLat'] and data['CarLon']:
-                    return [data['CarLat'], data['CarLon']]
-                else:
-                    return False
-            break
-        return False
+        try:
+            rs = requests.post(url=self.url, data=self.data, headers=self.headers)
+            jData = json.loads(rs.content.decode())
+            for data in jData:
+                if data['RouteID'] == routeId:
+                    if data['CarLat'] and data['CarLon']:
+                        return [data['CarLat'], data['CarLon']]
+                    else:
+                        return False
+                break
+            return False
+        except ConnectionError:
+            print('Request has been reject, pls wait and retry')
 
 
 if __name__ == '__main__':
